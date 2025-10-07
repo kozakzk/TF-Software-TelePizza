@@ -49,22 +49,4 @@ public class CozinhaService {
             scheduler.schedule(() -> colocaEmPreparacao(prox), 1, TimeUnit.SECONDS);
         }
     }
-
-    public synchronized void cancelarPedido(Pedido pedido){
-        if(pedido.getStatus() == Pedido.Status.APROVADO && pedido.getStatus() != Pedido.Status.PAGO){
-            if(filaEntrada.contains(pedido)){
-                filaEntrada.remove(pedido);
-            }else if(emPreparacao != null && emPreparacao.equals(pedido)){
-                emPreparacao = null;
-                if(!filaEntrada.isEmpty()){
-                    scheduler.schedule(() -> colocaEmPreparacao(filaEntrada.poll()), 
-                                    1, TimeUnit.SECONDS);
-                }
-            }else if(filaSaida.contains(pedido)){
-                filaSaida.remove(pedido);
-            }
-            pedido.setStatus(Pedido.Status.CANCELADO);
-            System.out.println("Pedido cancelado: " + pedido);
-        }
-    }
-    }
+}
