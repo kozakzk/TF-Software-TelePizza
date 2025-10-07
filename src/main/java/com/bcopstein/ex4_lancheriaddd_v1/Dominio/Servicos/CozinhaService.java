@@ -1,17 +1,23 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos;
 
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.stereotype.Service;
+
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 
+@Service
 public class CozinhaService {
     private Queue<Pedido> filaEntrada;
     private Pedido emPreparacao;
     private Queue<Pedido> filaSaida;
+    private Map<Long,Pedido> pedidosById;
 
     private ScheduledExecutorService scheduler;
 
@@ -19,6 +25,7 @@ public class CozinhaService {
         filaEntrada = new LinkedBlockingQueue<Pedido>();
         emPreparacao = null;
         filaSaida = new LinkedBlockingQueue<Pedido>();
+        pedidosById = new ConcurrentHashMap<>();
         scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
@@ -31,6 +38,7 @@ public class CozinhaService {
     }
 
     public synchronized void chegadaDePedido(Pedido p) {
+        pedidosById.put(p.getId(), p);
         filaEntrada.add(p);
         System.out.println("Pedido na fila de entrada: "+p);
         if (emPreparacao == null) {
@@ -48,5 +56,10 @@ public class CozinhaService {
             Pedido prox = filaEntrada.poll();
             scheduler.schedule(() -> colocaEmPreparacao(prox), 1, TimeUnit.SECONDS);
         }
+    }
+
+    public synchronized Pedido.Status recuperaStatusPedido(long id){
+        Pedido pedido = pedidosById.get(id);
+        return pedido == null ? null : pedido.getStatus();
     }
 }
