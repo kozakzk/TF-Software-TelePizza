@@ -24,18 +24,16 @@ public class PedidoService {
     private final ProdutosRepository produtosRepository;
     private final EstoqueService estoqueService;
     private final DescontosService descontosService;
-    private final CozinhaService cozinhaService;
 
     @Autowired
     public PedidoService(PedidoRepository pedidoRepository, ClienteRepository clienteRepository,
             ProdutosRepository produtosRepository, EstoqueService estoqueService,
-            DescontosService descontosService, CozinhaService cozinhaService) {
+            DescontosService descontosService) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
         this.produtosRepository = produtosRepository;
         this.estoqueService = estoqueService;
         this.descontosService = descontosService;
-        this.cozinhaService = cozinhaService;
     }
 
     public Pedido submeterPedido(SubmeterPedidoRequest request) {
@@ -69,10 +67,8 @@ public class PedidoService {
         double impostos = subtotal * 0.10;
         double valorFinal = subtotal - desconto + impostos;
 
-        long novoId = cozinhaService.geraIdPedido();
-
         Pedido novoPedido = new Pedido(
-                novoId,
+                0L,
                 cliente,
                 null,
                 itens,
@@ -82,26 +78,32 @@ public class PedidoService {
                 desconto,
                 valorFinal
         );
-
-        cozinhaService.chegadaDePedido(novoPedido);
+        long novoPedidoId = pedidoRepository.salvaPedido(novoPedido);
+        novoPedido.setId(novoPedidoId);
 
         return novoPedido;
     }
 
     public PedidoStatusResponse cancelarPedidoAprovadoNaoPago(Long id) {
-        Pedido pedido = cozinhaService.recuperaPedidoPorId(id);
-
+        Pedido pedido = pedidoRepository.recuperaPorId(id);
         if (pedido == null) {
             throw new IllegalArgumentException("Pedido com ID " + id + " não encontrado");
         }
 
         if (pedido.getStatus() == Pedido.Status.APROVADO && pedido.getDataHoraPagamento() == null) {
             pedido.setStatus(Pedido.Status.CANCELADO);
-            /* pedidoRepository.atualizaPedido(pedido); */
-            cozinhaService.atualizaPedido(pedido);
-            return new PedidoStatusResponse(id, pedido.getStatus());
+            pedidoRepository.atualizaPedido(pedido);
+            return new PedidoStatusResponse(id, pedido.getStatus(), null);
         }
 
         throw new IllegalStateException("Pedido não pode ser cancelado. Status atual: " + pedido.getStatus());
+    }
+
+    public Pedido.Status recuperaStatusPedido(long pedidoId) {
+        Pedido pedido = pedidoRepository.recuperaPorId(pedidoId);
+        if (pedido == null) {
+            throw new IllegalArgumentException("Pedido com ID " + pedidoId + " não encontrado");
+        }
+        return pedido.getStatus();
     }
 }

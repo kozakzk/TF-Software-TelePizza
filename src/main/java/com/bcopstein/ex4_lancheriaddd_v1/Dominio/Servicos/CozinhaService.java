@@ -65,18 +65,4 @@ public class CozinhaService {
             scheduler.schedule(() -> colocaEmPreparacao(prox), 1, TimeUnit.SECONDS);
         }
     }
-
-    public synchronized Pedido.Status recuperaStatusPedido(long id) {
-        Pedido pedido = pedidosById.get(id);
-        return pedido == null ? null : pedido.getStatus();
-    }
-
-    public synchronized Pedido recuperaPedidoPorId(long id) {
-        return pedidosById.get(id);
-    }
-
-    public synchronized Pedido atualizaPedido(Pedido pedido) {
-        pedidosById.put(pedido.getId(), pedido);
-        return pedido;
-    }
 }

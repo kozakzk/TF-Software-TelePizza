@@ -87,8 +87,8 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
     }
 
     public Pedido atualizaPedido(Pedido pedido) {
-        String sql = "UPDATE pedidos SET cliente_cpf = ?, data_hora_pagamento = ?, status = ?, valor = ?, impostos = ?, desconto = ?, valor_cobrado = ? WHERE id = ?";
-        jdbcTemplate.update(sql, pedido.getCliente().getCpf(),
+        String sql = "UPDATE pedidos SET data_hora_pagamento = ?, status = ?, valor = ?, impostos = ?, desconto = ?, valor_cobrado = ? WHERE id = ?";
+        jdbcTemplate.update(sql,
                 pedido.getDataHoraPagamento() != null ? java.sql.Timestamp.valueOf(pedido.getDataHoraPagamento()) : null,
                 pedido.getStatus().name(),
                 pedido.getValor(),

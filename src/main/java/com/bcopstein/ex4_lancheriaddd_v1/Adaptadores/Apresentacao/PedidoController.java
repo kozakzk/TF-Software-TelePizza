@@ -40,12 +40,22 @@ public class PedidoController {
     @GetMapping("/{id}/status")
     @CrossOrigin("*")
     public PedidoStatusResponse recuperaStatus(@PathVariable("id") long id) {
-        PedidoStatusResponse resp = recuperarStatusPedidoUC.run(id);
-        return new PedidoStatusResponse(resp.id(), resp.status());
+        try {
+            PedidoStatusResponse resp = recuperarStatusPedidoUC.run(id);
+            return new PedidoStatusResponse(resp.id(), resp.status(), null);
+        } catch (Exception e) {
+            System.out.println("Erro ao recuperar status do pedido: " + e.getMessage());
+            return new PedidoStatusResponse(id, null, e.getMessage());
+        }
     }
 
     @PostMapping("/{id}/cancelar")
     public PedidoStatusResponse cancelarPedido(@PathVariable Long id) {
-        return cancelarPedidoUC.run(id);
+        try {
+            return cancelarPedidoUC.run(id);
+        } catch (Exception e) {
+            System.out.println("Erro ao cancelar pedido: " + e.getMessage());
+            return new PedidoStatusResponse(id, null, e.getMessage());
+        }
     }
 }

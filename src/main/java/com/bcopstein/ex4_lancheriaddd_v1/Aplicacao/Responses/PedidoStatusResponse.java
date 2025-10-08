@@ -2,4 +2,6 @@ package com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 
-public record PedidoStatusResponse(long id, Pedido.Status status) {}
+public record PedidoStatusResponse(long id, Pedido.Status status, String error) {
+
+}
