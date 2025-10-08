@@ -41,7 +41,7 @@ public class Produto {
         this.preco = preco;
     }
 
-    // Valida um preco (preco em centavos)
+  
     public static boolean precoValido(int preco) {
         return preco > 0;
     }
