@@ -14,10 +14,11 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 
 @Service
 public class CozinhaService {
+
     private Queue<Pedido> filaEntrada;
     private Pedido emPreparacao;
     private Queue<Pedido> filaSaida;
-    private Map<Long,Pedido> pedidosById;
+    private Map<Long, Pedido> pedidosById;
 
     private ScheduledExecutorService scheduler;
 
@@ -29,36 +30,36 @@ public class CozinhaService {
         scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
-    private synchronized void colocaEmPreparacao(Pedido pedido){
+    private synchronized void colocaEmPreparacao(Pedido pedido) {
         pedido.setStatus(Pedido.Status.PREPARACAO);
         emPreparacao = pedido;
-        System.out.println("Pedido em preparacao: "+pedido);
+        System.out.println("Pedido em preparacao: " + pedido);
         // Agenda pedidoPronto para ser chamado em 2 segundos
         scheduler.schedule(() -> pedidoPronto(), 5, TimeUnit.SECONDS);
     }
 
     public synchronized void chegadaDePedido(Pedido p) {
         pedidosById.put(p.getId(), p);
-        filaEntrada.add(p);
-        System.out.println("Pedido na fila de entrada: "+p);
+        /* filaEntrada.add(p);
+        System.out.println("Pedido na fila de entrada: " + p);
         if (emPreparacao == null) {
             colocaEmPreparacao(filaEntrada.poll());
-        }
+        } */
     }
 
     public synchronized void pedidoPronto() {
         emPreparacao.setStatus(Pedido.Status.PRONTO);
         filaSaida.add(emPreparacao);
-        System.out.println("Pedido na fila de saida: "+emPreparacao);
+        System.out.println("Pedido na fila de saida: " + emPreparacao);
         emPreparacao = null;
         // Se tem pedidos na fila, programa a preparação para daqui a 1 segundo
-        if (!filaEntrada.isEmpty()){
+        if (!filaEntrada.isEmpty()) {
             Pedido prox = filaEntrada.poll();
             scheduler.schedule(() -> colocaEmPreparacao(prox), 1, TimeUnit.SECONDS);
         }
     }
 
-    public synchronized Pedido.Status recuperaStatusPedido(long id){
+    public synchronized Pedido.Status recuperaStatusPedido(long id) {
         Pedido pedido = pedidosById.get(id);
         return pedido == null ? null : pedido.getStatus();
     }
