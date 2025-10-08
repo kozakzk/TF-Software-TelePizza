@@ -3,8 +3,8 @@ package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -22,12 +22,15 @@ public class CozinhaService {
 
     private ScheduledExecutorService scheduler;
 
+    private long contadorId;
+
     public CozinhaService() {
         filaEntrada = new LinkedBlockingQueue<Pedido>();
         emPreparacao = null;
         filaSaida = new LinkedBlockingQueue<Pedido>();
         pedidosById = new ConcurrentHashMap<>();
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        contadorId = 1L;
     }
 
     private synchronized void colocaEmPreparacao(Pedido pedido) {
@@ -47,6 +50,10 @@ public class CozinhaService {
         } */
     }
 
+    public synchronized long geraIdPedido() {
+        return contadorId++;
+    }
+
     public synchronized void pedidoPronto() {
         emPreparacao.setStatus(Pedido.Status.PRONTO);
         filaSaida.add(emPreparacao);
@@ -62,5 +69,14 @@ public class CozinhaService {
     public synchronized Pedido.Status recuperaStatusPedido(long id) {
         Pedido pedido = pedidosById.get(id);
         return pedido == null ? null : pedido.getStatus();
+    }
+
+    public synchronized Pedido recuperaPedidoPorId(long id) {
+        return pedidosById.get(id);
+    }
+
+    public synchronized Pedido atualizaPedido(Pedido pedido) {
+        pedidosById.put(pedido.getId(), pedido);
+        return pedido;
     }
 }

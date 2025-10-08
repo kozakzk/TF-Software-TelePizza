@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.CancelarPedidoUC;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.RecuperarStatusPedidoUC;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.SubmeterPedidoRequest;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoResponse;
@@ -21,11 +22,13 @@ public class PedidoController {
 
     private final SubmeterPedidoUC submeterPedidoUC;
     private final RecuperarStatusPedidoUC recuperarStatusPedidoUC;
+    private final CancelarPedidoUC cancelarPedidoUC;
 
     @Autowired
-    public PedidoController(SubmeterPedidoUC submeterPedidoUC, RecuperarStatusPedidoUC recuperarStatusPedidoUC) {
+    public PedidoController(SubmeterPedidoUC submeterPedidoUC, RecuperarStatusPedidoUC recuperarStatusPedidoUC, CancelarPedidoUC cancelarPedidoUC) {
         this.submeterPedidoUC = submeterPedidoUC;
         this.recuperarStatusPedidoUC = recuperarStatusPedidoUC;
+        this.cancelarPedidoUC = cancelarPedidoUC;
     }
 
     @PostMapping("/submeter")
@@ -40,18 +43,9 @@ public class PedidoController {
         PedidoStatusResponse resp = recuperarStatusPedidoUC.run(id);
         return new PedidoStatusResponse(resp.id(), resp.status());
     }
+
     @PostMapping("/{id}/cancelar")
-    public ResponseEntity<?> cancelarPedido(@PathVariable Long id) {
-        try {
-            boolean cancelado = pedidoService.cancelarPedidoAprovadoNaoPago(id);
-            if (cancelado) {
-                return ResponseEntity.ok().body("Pedido cancelado com sucesso");
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body("Pedido não pode ser cancelado. Apenas pedidos APROVADOS e NÃO PAGOS podem ser cancelados.");
-            }
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public PedidoStatusResponse cancelarPedido(@PathVariable Long id) {
+        return cancelarPedidoUC.run(id);
     }
 }

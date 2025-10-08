@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.SubmeterPedidoRequest;
+import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoStatusResponse;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.ClienteRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidoRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.ProdutosRepository;
@@ -68,8 +69,10 @@ public class PedidoService {
         double impostos = subtotal * 0.10;
         double valorFinal = subtotal - desconto + impostos;
 
+        long novoId = cozinhaService.geraIdPedido();
+
         Pedido novoPedido = new Pedido(
-                0L,
+                novoId,
                 cliente,
                 null,
                 itens,
@@ -80,27 +83,25 @@ public class PedidoService {
                 valorFinal
         );
 
-        long novoPedidoId = pedidoRepository.salvaPedido(novoPedido);
-        novoPedido.setId(novoPedidoId);
-
         cozinhaService.chegadaDePedido(novoPedido);
 
         return novoPedido;
     }
-    public boolean cancelarPedidoAprovadoNaoPago(Long id) {
-        Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
-        
-        if (!pedidoOpt.isPresent()) {
+
+    public PedidoStatusResponse cancelarPedidoAprovadoNaoPago(Long id) {
+        Pedido pedido = cozinhaService.recuperaPedidoPorId(id);
+
+        if (pedido == null) {
             throw new IllegalArgumentException("Pedido com ID " + id + " não encontrado");
         }
-        
-        Pedido pedido = pedidoOpt.get();
-        
+
         if (pedido.getStatus() == Pedido.Status.APROVADO && pedido.getDataHoraPagamento() == null) {
-            pedidoRepository.delete(id);
-            return true;
+            pedido.setStatus(Pedido.Status.CANCELADO);
+            /* pedidoRepository.atualizaPedido(pedido); */
+            cozinhaService.atualizaPedido(pedido);
+            return new PedidoStatusResponse(id, pedido.getStatus());
         }
-        
-        return false;
+
+        throw new IllegalStateException("Pedido não pode ser cancelado. Status atual: " + pedido.getStatus());
     }
 }

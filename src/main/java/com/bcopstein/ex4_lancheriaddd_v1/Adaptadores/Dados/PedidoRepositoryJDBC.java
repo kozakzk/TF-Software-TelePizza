@@ -1,46 +1,5 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Adaptadores.Dados;
 
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
-
-@Repository
-public class PedidoRepositoryJDBC {
-    
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    public Optional<Pedido> findById(Long id) {
-        String sql = "SELECT status, data_hora_pagamento FROM pedidos WHERE id = ?";
-        
-        return jdbcTemplate.query(sql, rs -> {
-            try {
-                if (rs.next()) {
-                    Pedido.Status status = Pedido.Status.valueOf(rs.getString("status"));
-                    java.sql.Timestamp timestamp = rs.getTimestamp("data_hora_pagamento");
-                    Pedido pedido = new Pedido(
-                        id, 
-                        null, 
-                        timestamp != null ? timestamp.toLocalDateTime() : null, 
-                        null, 
-                        status, 
-                        0, 0, 0, 0
-                    );
-                    return Optional.of(pedido);
-                }
-                return Optional.empty();
-            } catch (java.sql.SQLException e) {
-                return Optional.empty();
-            }
-        }, id);
-    }
-    
-    public void delete(Long id) {
-        String sql = "DELETE FROM pedidos WHERE id = ?";
-        jdbcTemplate.update(sql, id);
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
@@ -58,7 +17,7 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 @Repository
 public class PedidoRepositoryJDBC implements PedidoRepository {
 
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public PedidoRepositoryJDBC(JdbcTemplate jdbcTemplate) {
@@ -68,7 +27,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
     @Override
     @Transactional
     public long salvaPedido(Pedido pedido) {
-       
+
         String sqlPedido = "INSERT INTO pedidos (cliente_cpf, data_hora_pagamento, status, valor, impostos, desconto, valor_cobrado) VALUES (?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -99,5 +58,45 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         String sql = "SELECT COUNT(*) FROM pedidos WHERE cliente_cpf = ? AND data_hora_pagamento >= CURRENT_DATE - 20";
         Integer count = jdbcTemplate.queryForObject(sql, new Object[]{cpf}, Integer.class);
         return (count != null) ? count : 0;
+    }
+
+    @Override
+    public Pedido recuperaPorId(long id) {
+        String sql = "SELECT status, data_hora_pagamento FROM pedidos WHERE id = ?";
+
+        return jdbcTemplate.query(sql, rs -> {
+            try {
+                if (rs.next()) {
+                    Pedido.Status status = Pedido.Status.valueOf(rs.getString("status"));
+                    java.sql.Timestamp timestamp = rs.getTimestamp("data_hora_pagamento");
+                    Pedido pedido = new Pedido(
+                            id,
+                            null,
+                            timestamp != null ? timestamp.toLocalDateTime() : null,
+                            null,
+                            status,
+                            0, 0, 0, 0
+                    );
+                    return pedido;
+                }
+                return null;
+            } catch (java.sql.SQLException e) {
+                return null;
+            }
+        }, id);
+    }
+
+    public Pedido atualizaPedido(Pedido pedido) {
+        String sql = "UPDATE pedidos SET cliente_cpf = ?, data_hora_pagamento = ?, status = ?, valor = ?, impostos = ?, desconto = ?, valor_cobrado = ? WHERE id = ?";
+        jdbcTemplate.update(sql, pedido.getCliente().getCpf(),
+                pedido.getDataHoraPagamento() != null ? java.sql.Timestamp.valueOf(pedido.getDataHoraPagamento()) : null,
+                pedido.getStatus().name(),
+                pedido.getValor(),
+                pedido.getImpostos(),
+                pedido.getDesconto(),
+                pedido.getValorCobrado(),
+                pedido.getId());
+        Pedido recuperado = recuperaPorId(pedido.getId());
+        return recuperado;
     }
 }
