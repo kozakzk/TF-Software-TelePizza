@@ -40,4 +40,18 @@ public class PedidoController {
         PedidoStatusResponse resp = recuperarStatusPedidoUC.run(id);
         return new PedidoStatusResponse(resp.id(), resp.status());
     }
+    @PostMapping("/{id}/cancelar")
+    public ResponseEntity<?> cancelarPedido(@PathVariable Long id) {
+        try {
+            boolean cancelado = pedidoService.cancelarPedidoAprovadoNaoPago(id);
+            if (cancelado) {
+                return ResponseEntity.ok().body("Pedido cancelado com sucesso");
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Pedido não pode ser cancelado. Apenas pedidos APROVADOS e NÃO PAGOS podem ser cancelados.");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

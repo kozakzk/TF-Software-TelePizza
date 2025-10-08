@@ -87,4 +87,20 @@ public class PedidoService {
 
         return novoPedido;
     }
+    public boolean cancelarPedidoAprovadoNaoPago(Long id) {
+        Optional<Pedido> pedidoOpt = pedidoRepository.findById(id);
+        
+        if (!pedidoOpt.isPresent()) {
+            throw new IllegalArgumentException("Pedido com ID " + id + " não encontrado");
+        }
+        
+        Pedido pedido = pedidoOpt.get();
+        
+        if (pedido.getStatus() == Pedido.Status.APROVADO && pedido.getDataHoraPagamento() == null) {
+            pedidoRepository.delete(id);
+            return true;
+        }
+        
+        return false;
+    }
 }
