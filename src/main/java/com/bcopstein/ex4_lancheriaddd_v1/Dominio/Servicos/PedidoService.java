@@ -126,7 +126,7 @@ public class PedidoService {
 
         if (pagamentoEfetuado) {
             pedido.setStatus(Pedido.Status.PAGO);
-            pedido.defineDataPagamento(LocalDateTime.now()); // Precisamos adicionar este método na entidade Pedido
+            pedido.defineDataPagamento(LocalDateTime.now()); 
             pedidoRepository.atualizaPedido(pedido);
             cozinhaService.chegadaDePedido(pedido);
             return new PedidoStatusResponse(id, pedido.getStatus(), null);
