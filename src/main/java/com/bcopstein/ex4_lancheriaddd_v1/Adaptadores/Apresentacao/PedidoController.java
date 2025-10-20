@@ -15,6 +15,7 @@ import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.SubmeterPedidoReques
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoResponse;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoStatusResponse;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.SubmeterPedidoUC;
+import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.PagarPedidoUC;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -23,12 +24,14 @@ public class PedidoController {
     private final SubmeterPedidoUC submeterPedidoUC;
     private final RecuperarStatusPedidoUC recuperarStatusPedidoUC;
     private final CancelarPedidoUC cancelarPedidoUC;
+    private final PagarPedidoUC pagarPedidoUC;
 
     @Autowired
-    public PedidoController(SubmeterPedidoUC submeterPedidoUC, RecuperarStatusPedidoUC recuperarStatusPedidoUC, CancelarPedidoUC cancelarPedidoUC) {
+    public PedidoController(SubmeterPedidoUC submeterPedidoUC, RecuperarStatusPedidoUC recuperarStatusPedidoUC, CancelarPedidoUC cancelarPedidoUC, PagarPedidoUC pagarPedidoUC) {
         this.submeterPedidoUC = submeterPedidoUC;
         this.recuperarStatusPedidoUC = recuperarStatusPedidoUC;
         this.cancelarPedidoUC = cancelarPedidoUC;
+        this.pagarPedidoUC = pagarPedidoUC;
     }
 
     @PostMapping("/submeter")
@@ -58,4 +61,16 @@ public class PedidoController {
             return new PedidoStatusResponse(id, null, e.getMessage());
         }
     }
+    
+    @PostMapping("/{id}/pagar")
+    @CrossOrigin("*")
+    public PedidoStatusResponse pagarPedido(@PathVariable Long id) {
+        try {
+            return pagarPedidoUC.run(id);
+        } catch (Exception e) {
+            System.out.println("Erro ao pagar pedido: " + e.getMessage());
+            return new PedidoStatusResponse(id, null, e.getMessage());
+        }
+    }
+
 }

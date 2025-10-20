@@ -1,5 +1,6 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,16 +25,20 @@ public class PedidoService {
     private final ProdutosRepository produtosRepository;
     private final EstoqueService estoqueService;
     private final DescontosService descontosService;
+    private final PagamentoService pagamentoService; 
+    private final CozinhaService cozinhaService;
 
     @Autowired
     public PedidoService(PedidoRepository pedidoRepository, ClienteRepository clienteRepository,
             ProdutosRepository produtosRepository, EstoqueService estoqueService,
-            DescontosService descontosService) {
+            DescontosService descontosService, PagamentoService pagamentoService, CozinhaService cozinhaService) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
         this.produtosRepository = produtosRepository;
         this.estoqueService = estoqueService;
         this.descontosService = descontosService;
+        this.pagamentoService = pagamentoService;
+        this.cozinhaService = cozinhaService;
     }
 
     public Pedido submeterPedido(SubmeterPedidoRequest request) {
@@ -105,5 +110,28 @@ public class PedidoService {
             throw new IllegalArgumentException("Pedido com ID " + pedidoId + " não encontrado");
         }
         return pedido.getStatus();
+    }
+
+    public PedidoStatusResponse pagarPedido(Long id) {
+        Pedido pedido = pedidoRepository.recuperaPorId(id);
+        if (pedido == null) {
+            throw new IllegalArgumentException("Pedido com ID " + id + " não encontrado");
+        }
+
+        if (pedido.getStatus() != Pedido.Status.APROVADO) {
+            throw new IllegalStateException("Apenas pedidos com status APROVADO podem ser pagos. Status atual: " + pedido.getStatus());
+        }
+
+        boolean pagamentoEfetuado = pagamentoService.efetuaPagamento(pedido);
+
+        if (pagamentoEfetuado) {
+            pedido.setStatus(Pedido.Status.PAGO);
+            pedido.defineDataPagamento(LocalDateTime.now()); 
+            pedidoRepository.atualizaPedido(pedido);
+            cozinhaService.chegadaDePedido(pedido);
+            return new PedidoStatusResponse(id, pedido.getStatus(), null);
+        } else {
+             throw new IllegalStateException("Pagamento não autorizado.");
+        }
     }
 }
