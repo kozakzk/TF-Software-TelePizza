@@ -25,20 +25,18 @@ public class PedidoService {
     private final ProdutosRepository produtosRepository;
     private final EstoqueService estoqueService;
     private final DescontosService descontosService;
-    private final PagamentoService pagamentoService; 
-    private final CozinhaService cozinhaService;
+    private final PagamentoService pagamentoService;
 
     @Autowired
     public PedidoService(PedidoRepository pedidoRepository, ClienteRepository clienteRepository,
             ProdutosRepository produtosRepository, EstoqueService estoqueService,
-            DescontosService descontosService, PagamentoService pagamentoService, CozinhaService cozinhaService) {
+            DescontosService descontosService, PagamentoService pagamentoService) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
         this.produtosRepository = produtosRepository;
         this.estoqueService = estoqueService;
         this.descontosService = descontosService;
         this.pagamentoService = pagamentoService;
-        this.cozinhaService = cozinhaService;
     }
 
     public Pedido submeterPedido(SubmeterPedidoRequest request) {
@@ -126,12 +124,34 @@ public class PedidoService {
 
         if (pagamentoEfetuado) {
             pedido.setStatus(Pedido.Status.PAGO);
-            pedido.defineDataPagamento(LocalDateTime.now()); 
+            pedido.defineDataPagamento(LocalDateTime.now());
             pedidoRepository.atualizaPedido(pedido);
-            cozinhaService.chegadaDePedido(pedido);
             return new PedidoStatusResponse(id, pedido.getStatus(), null);
         } else {
-             throw new IllegalStateException("Pagamento não autorizado.");
+            throw new IllegalStateException("Pagamento não autorizado.");
         }
+    }
+
+    public List<Pedido> listarPedidosEntregues(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        return pedidoRepository.listarPedidosEntregues(dataInicio, dataFim);
+    }
+
+    public List<Pedido> listarPedidos() {
+        return pedidoRepository.listarPedidos();
+    }
+
+    public PedidoStatusResponse entregarPedido(Long id) {
+        Pedido pedido = pedidoRepository.recuperaPorId(id);
+        if (pedido == null) {
+            throw new IllegalArgumentException("Pedido com ID " + id + " não encontrado");
+        }
+
+        if (pedido.getStatus() != Pedido.Status.PAGO) {
+            throw new IllegalStateException("Apenas pedidos com status PAGO podem ser entregues. Status atual: " + pedido.getStatus());
+        }
+
+        pedido.setStatus(Pedido.Status.ENTREGUE);
+        pedidoRepository.atualizaPedido(pedido);
+        return new PedidoStatusResponse(id, pedido.getStatus(), null);
     }
 }

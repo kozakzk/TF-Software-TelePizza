@@ -27,7 +27,8 @@ public class SubmeterPedidoUC {
                 pedidoCriado.getValor(),
                 pedidoCriado.getDesconto(),
                 pedidoCriado.getImpostos(),
-                pedidoCriado.getValorCobrado()
+                pedidoCriado.getValorCobrado(),
+                pedidoCriado.getDataHoraPagamento()
         );
     }
 }

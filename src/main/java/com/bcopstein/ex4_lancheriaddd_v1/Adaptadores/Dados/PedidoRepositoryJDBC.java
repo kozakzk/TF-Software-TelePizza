@@ -2,6 +2,8 @@ package com.bcopstein.ex4_lancheriaddd_v1.Adaptadores.Dados;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,7 +34,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement ps = connection.prepareStatement(sqlPedido, new String[]{"id"});
             ps.setString(1, pedido.getCliente().getCpf());
             ps.setTimestamp(2, pedido.getDataHoraPagamento() != null ? java.sql.Timestamp.valueOf(pedido.getDataHoraPagamento()) : null);
             ps.setString(3, pedido.getStatus().name());
@@ -86,6 +88,7 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
         }, id);
     }
 
+    @Override
     public Pedido atualizaPedido(Pedido pedido) {
         String sql = "UPDATE pedidos SET data_hora_pagamento = ?, status = ?, valor = ?, impostos = ?, desconto = ?, valor_cobrado = ? WHERE id = ?";
         jdbcTemplate.update(sql,
@@ -98,5 +101,41 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
                 pedido.getId());
         Pedido recuperado = recuperaPorId(pedido.getId());
         return recuperado;
+    }
+
+    @Override
+    public List<Pedido> listarPedidosEntregues(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        String sql = "SELECT id, data_hora_pagamento, status, valor, impostos, desconto, valor_cobrado FROM pedidos WHERE status = ? AND data_hora_pagamento BETWEEN ? AND ?";
+        return jdbcTemplate.query(sql, new Object[]{Pedido.Status.ENTREGUE.name(), java.sql.Timestamp.valueOf(dataInicio), java.sql.Timestamp.valueOf(dataFim)},
+                (rs, rowNum) -> {
+                    long id = rs.getLong("id");
+                    java.sql.Timestamp timestamp = rs.getTimestamp("data_hora_pagamento");
+                    Pedido.Status status = Pedido.Status.valueOf(rs.getString("status"));
+                    double valor = rs.getDouble("valor");
+                    double impostos = rs.getDouble("impostos");
+                    double desconto = rs.getDouble("desconto");
+                    double valorCobrado = rs.getDouble("valor_cobrado");
+                    return new Pedido(id, null, timestamp.toLocalDateTime(), null, status, valor, impostos, desconto, valorCobrado);
+                });
+    }
+
+    @Override
+    public List<Pedido> listarPedidos() {
+        String sql = "SELECT id, data_hora_pagamento, status, valor, impostos, desconto, valor_cobrado FROM pedidos";
+        return jdbcTemplate.query(sql,
+                (rs, rowNum) -> {
+                    long id = rs.getLong("id");
+                    java.sql.Timestamp timestamp = rs.getTimestamp("data_hora_pagamento");
+                    LocalDateTime dataHoraPagamento = null;
+                    if (timestamp != null) {
+                        dataHoraPagamento = timestamp.toLocalDateTime();
+                    }
+                    Pedido.Status status = Pedido.Status.valueOf(rs.getString("status"));
+                    double valor = rs.getDouble("valor");
+                    double impostos = rs.getDouble("impostos");
+                    double desconto = rs.getDouble("desconto");
+                    double valorCobrado = rs.getDouble("valor_cobrado");
+                    return new Pedido(id, null, dataHoraPagamento, null, status, valor, impostos, desconto, valorCobrado);
+                });
     }
 }

@@ -1,26 +1,11 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:pizzadb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://ep-cool-base-adv91zvu-pooler.c-2.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&channelBinding=require
+    username: neondb_owner
+    password: npg_cCiaPJu3oE5F
+    driver-class-name: org.postgresql.Driver
   sql:
     init:
-      mode: always   # executa schema.sql no boot
-    schema-locations: classpath:schema.sql
-    data-locations: classpath:data.sql
-  h2:
-    console:
-      enabled: true
-      path: /h2
-logging:
-  level:
-    org:
-      springframework:
-        jdbc: DEBUG
-    com:
-      bcopstein: DEBUG
-application:
-  name: ex4-lancheriaddd-v1
-server:
-  port: 8080
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Pedido {
+
     public enum Status {
         NOVO,
         APROVADO,
@@ -58,7 +59,7 @@ public class Pedido {
         return status;
     }
 
-    public void setStatus(Status status){
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -77,11 +78,12 @@ public class Pedido {
     public double getValorCobrado() {
         return valorCobrado;
     }
-     public void setId(long id) {
+
+    public void setId(long id) {
         this.id = id;
     }
 
-     public void defineDataPagamento(LocalDateTime now) {
-        this.dataHoraPagamento = dataHoraPagamento;
-     }
+    public void defineDataPagamento(LocalDateTime now) {
+        this.dataHoraPagamento = now;
+    }
 }
