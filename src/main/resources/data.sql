@@ -1,25 +1,43 @@
--- Inserção dos clientes
+-- Usuário Master Admin
 INSERT INTO
-    clientes (
+    usuarios (
         cpf,
         nome,
         celular,
         endereco,
-        email
+        email,
+        senha,
+        role
+    )
+VALUES (
+        '0001',
+        'Administrador Master',
+        '51999990000',
+        'Sistema',
+        'admin@sistema.com',
+        '$2a$10$4HgO8Kg3noCmt/dEiP8.peas3LsJmdijLyiSTemgD2aGWDbnp.ezi', --cliente123
+        'admin'
+    );
+
+-- Usuário Cliente Mock
+INSERT INTO
+    usuarios (
+        cpf,
+        nome,
+        celular,
+        endereco,
+        email,
+        senha,
+        role
     )
 VALUES (
         '9001',
         'Huguinho Pato',
         '51985744566',
         'Rua das Flores, 100',
-        'huguinho.pato@email.com'
-    ),
-    (
-        '9002',
-        'Luizinho Pato',
-        '5199172079',
-        'Av. Central, 200',
-        'zezinho.pato@email.com'
+        'huguinho.pato@email.com',
+        '$2a$10$4HgO8Kg3noCmt/dEiP8.peas3LsJmdijLyiSTemgD2aGWDbnp.ezi',
+        'cliente'
     );
 
 -- Inserção dos ingredientes
@@ -124,14 +142,6 @@ VALUES (
         5.50,
         0,
         60.50
-    ),
-    (
-        '9002',
-        'APROVADO',
-        100.00,
-        10.00,
-        5.00,
-        105.00
     ),
     (
         '9001',
