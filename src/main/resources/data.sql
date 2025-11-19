@@ -112,9 +112,9 @@ VALUES (1, 1),
 
 -- Inserção dos cardápios
 INSERT INTO
-    cardapios (titulo)
-VALUES ('Cardapio de Agosto'),
-    ('Cardapio de Setembro');
+    cardapios (titulo, active)
+VALUES ('Cardapio de Agosto', false),
+    ('Cardapio de Setembro', true);
 
 -- Associação dos cardápios com os produtos
 INSERT INTO

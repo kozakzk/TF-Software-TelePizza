@@ -29,7 +29,6 @@ public class EstoqueServiceImpl implements EstoqueService {
 
     @Override
     public boolean podeAtender(List<ItemPedido> itens) {
-        // Calcula a quantidade necessária de cada ingrediente
         Map<Long, Integer> ingredientesNecessarios = new HashMap<>();
 
         for (ItemPedido itemPedido : itens) {
@@ -42,17 +41,14 @@ public class EstoqueServiceImpl implements EstoqueService {
                 return false;
             }
 
-            // Para cada ingrediente da receita, adiciona a quantidade necessária
             List<Ingrediente> ingredientesReceita = receita.getIngredientes();
             for (Ingrediente ingrediente : ingredientesReceita) {
                 long ingredienteId = ingrediente.getId();
-                // Cada unidade do produto requer 1 unidade de cada ingrediente da receita
                 int quantidadeNecessaria = quantidadeProduto;
                 ingredientesNecessarios.merge(ingredienteId, quantidadeNecessaria, Integer::sum);
             }
         }
 
-        // Verifica se há estoque suficiente para todos os ingredientes necessários
         for (Map.Entry<Long, Integer> entry : ingredientesNecessarios.entrySet()) {
             long ingredienteId = entry.getKey();
             int quantidadeNecessaria = entry.getValue();
@@ -65,9 +61,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
             int quantidadeDisponivel = itemEstoque.getQuantidade();
             if (quantidadeDisponivel < quantidadeNecessaria) {
-                System.out.println("Estoque insuficiente para ingrediente ID " + ingredienteId + 
-                                 ". Necessário: " + quantidadeNecessaria + 
-                                 ", Disponível: " + quantidadeDisponivel);
+                System.out.println("Estoque insuficiente para ingrediente ID " + ingredienteId
+                        + ". Necessário: " + quantidadeNecessaria
+                        + ", Disponível: " + quantidadeDisponivel);
                 return false;
             }
         }
@@ -76,4 +72,3 @@ public class EstoqueServiceImpl implements EstoqueService {
         return true;
     }
 }
-
