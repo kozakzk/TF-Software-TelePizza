@@ -26,17 +26,19 @@ public class PedidoService {
     private final EstoqueService estoqueService;
     private final DescontosService descontosService;
     private final PagamentoService pagamentoService;
+    private final ImpostosService impostosService;
 
     @Autowired
     public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository clienteRepository,
             ProdutosRepository produtosRepository, EstoqueService estoqueService,
-            DescontosService descontosService, PagamentoService pagamentoService) {
+            DescontosService descontosService, PagamentoService pagamentoService, ImpostosService impostosService) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
         this.produtosRepository = produtosRepository;
         this.estoqueService = estoqueService;
         this.descontosService = descontosService;
         this.pagamentoService = pagamentoService;
+        this.impostosService = impostosService;
     }
 
     public Pedido submeterPedido(SubmeterPedidoRequest request) {
@@ -67,7 +69,7 @@ public class PedidoService {
 
         double percentualDesconto = descontosService.getPercentualDesconto(cliente);
         double desconto = subtotal * percentualDesconto;
-        double impostos = subtotal * 0.10;
+        double impostos = impostosService.calcularImpostos(subtotal);
         double valorFinal = subtotal - desconto + impostos;
 
         Pedido novoPedido = new Pedido(
