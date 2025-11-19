@@ -152,6 +152,11 @@ VALUES (
         44.00
     );
 
+-- Configuração inicial de desconto (4- parte 2)
+INSERT INTO configuracoes (chave, valor) 
+VALUES ('ESTRATEGIA_DESCONTO', 'ClienteFrequente') 
+ON CONFLICT (chave) DO NOTHING;
+
 -- Ajuste das sequências
 SELECT setval (
         pg_get_serial_sequence ('pedidos', 'id'), COALESCE(MAX(id), 0) + 1, false

@@ -18,4 +18,6 @@ public interface PedidoRepository {
     List<Pedido> listarPedidosEntregues(LocalDateTime dataInicio, LocalDateTime dataFim);
 
     List<Pedido> listarPedidos();
+
+    double valorTotalGastoCliente(String cpf, int dias); 
 }

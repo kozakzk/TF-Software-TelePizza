@@ -112,3 +112,9 @@ CREATE TABLE IF NOT EXISTS itens_pedido (
     quantidade INT NOT NULL,
     PRIMARY KEY (pedido_id, produto_id)
 );
+
+-- Tabela de Configurações do Sistema
+CREATE TABLE IF NOT EXISTS configuracoes (
+    chave VARCHAR(255) PRIMARY KEY,
+    valor VARCHAR(255) NOT NULL
+);

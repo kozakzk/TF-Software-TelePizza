@@ -138,4 +138,13 @@ public class PedidoRepositoryJDBC implements PedidoRepository {
                     return new Pedido(id, null, dataHoraPagamento, null, status, valor, impostos, desconto, valorCobrado);
                 });
     }
+
+    @Override
+    public double valorTotalGastoCliente(String cpf, int dias) {
+        // Soma o valor cobrado de pedidos PAGOS ou ENTREGUES nos últimos X dias
+        String sql = "SELECT SUM(valor_cobrado) FROM pedidos WHERE cliente_cpf = ? AND status IN ('PAGO', 'ENTREGUE') AND data_hora_pagamento >= CURRENT_DATE - " + dias;
+        
+        Double total = jdbcTemplate.queryForObject(sql, Double.class, cpf);
+        return (total != null) ? total : 0.0;
+    }
 }
