@@ -43,28 +43,28 @@ public class UsuarioService {
         );
 
         repo.salvar(usuario);
-        return new UsuarioResponse(0, usuario.getNome(), null);
+        return new UsuarioResponse(0, usuario.getEmail(), usuario.getCpf(), usuario.getCelular(), usuario.getEndereco(), usuario.getRole().name(), usuario.getNome(), null);
     }
 
     public UsuarioResponse buscarUsuario(String cpf) {
         Usuario u = repo.recuperaPorCpf(cpf);
         if (u == null) {
-            return new UsuarioResponse(0, null, "Usuário não encontrado");
+            return new UsuarioResponse(0, null, null, null, null, null, null, "Usuário não encontrado");
         }
 
-        return new UsuarioResponse(0, u.getNome(), null);
+        return new UsuarioResponse(0, u.getEmail(), u.getCpf(), u.getCelular(), u.getEndereco(), u.getRole().name(), u.getNome(), null);
     }
 
     public Iterable<UsuarioResponse> buscarUsuarios() {
         return StreamSupport.stream(repo.listar().spliterator(), false)
-                .map(u -> new UsuarioResponse(0, u.getNome(), null))
+                .map(u -> new UsuarioResponse(0, u.getEmail(), u.getCpf(), u.getCelular(), u.getEndereco(), u.getRole().name(), u.getNome(), null))
                 .toList();
     }
 
     public UsuarioResponse editarUsuario(String cpf, EditarUsuarioRequest r) {
         Usuario u = repo.recuperaPorCpf(cpf);
         if (u == null) {
-            return new UsuarioResponse(0, null, "Usuário não encontrado");
+            return new UsuarioResponse(0, null, null, null, null, null, null, "Usuário não encontrado");
         }
 
         String senhaHash = passwordEncoder.encode(r.senha());
@@ -74,12 +74,12 @@ public class UsuarioService {
 
         repo.editar(u);
 
-        return new UsuarioResponse(0, u.getNome(), null);
+        return new UsuarioResponse(0, u.getEmail(), u.getCpf(), u.getCelular(), u.getEndereco(), u.getRole().name(), u.getNome(), null);
     }
 
     public UsuarioResponse deletarUsuario(String cpf) {
         repo.deletar(cpf);
-        return new UsuarioResponse(0, "Deletado", null);
+        return new UsuarioResponse(0, "Deletado", null, null, null, null, null, null);
     }
 
     public LoginResponse login(LoginRequest r) {

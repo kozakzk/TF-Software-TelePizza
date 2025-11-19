@@ -1,7 +1,6 @@
 package com.bcopstein.ex4_lancheriaddd_v1.Dominio.Servicos;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,22 +12,31 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Produto;
 
 @Service
 public class CardapioService {
+
     private CardapioRepository cardapioRepository;
 
     @Autowired
-    public CardapioService(CardapioRepository cardapioRepository){
+    public CardapioService(CardapioRepository cardapioRepository) {
         this.cardapioRepository = cardapioRepository;
     }
 
-    public Cardapio recuperaCardapio(long Id){
+    public Cardapio recuperaCardapio(long Id) {
         return cardapioRepository.recuperaPorId(Id);
     }
 
-    public List<CabecalhoCardapio> recuperaListaDeCardapios(){
+    public Cardapio recuperaCardapioAtivo() {
+        return cardapioRepository.recuperaAtivo();
+    }
+
+    public List<CabecalhoCardapio> recuperaListaDeCardapios() {
         return cardapioRepository.cardapiosDisponiveis();
     }
 
-    public List<Produto> recuperaSugestoesDoChef(){
+    public List<Produto> recuperaSugestoesDoChef() {
         return cardapioRepository.indicacoesDoChef();
+    }
+
+    public boolean ativaCardapio(long id) {
+        return cardapioRepository.ativaCardapio(id);
     }
 }

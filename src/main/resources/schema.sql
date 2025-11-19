@@ -82,7 +82,8 @@ CREATE TABLE IF NOT EXISTS produto_receita (
 -- Tabela de Cardápios
 CREATE TABLE IF NOT EXISTS cardapios (
     id BIGSERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL
+    titulo VARCHAR(255) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- Tabela Cardápio x Produto

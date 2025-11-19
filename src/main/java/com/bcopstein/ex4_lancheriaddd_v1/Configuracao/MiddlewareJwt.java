@@ -28,7 +28,6 @@ public class MiddlewareJwt extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -44,7 +43,7 @@ public class MiddlewareJwt extends OncePerRequestFilter {
                 String email = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+                var authorities = List.of(new SimpleGrantedAuthority(role));
 
                 UsernamePasswordAuthenticationToken auth
                         = new UsernamePasswordAuthenticationToken(email, null, authorities);

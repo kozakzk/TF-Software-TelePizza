@@ -25,8 +25,8 @@ public class ConfigSeguranca {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/usuarios/login", "/usuarios/criar").permitAll()
-                .requestMatchers("/usuarios/**").hasAuthority("admin")
+                .requestMatchers("/", "/usuarios/login", "/usuarios/criar", "/cardapio/ativo").permitAll()
+                .requestMatchers("/usuarios/**", "/cardapio/*/ativa").hasAuthority("admin")
                 .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())

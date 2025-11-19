@@ -57,7 +57,7 @@ public class UsuarioController {
         try {
             return criarUsuarioUC.run(request);
         } catch (Exception e) {
-            return new UsuarioResponse(0, null, e.getMessage());
+            return new UsuarioResponse(0, null, null, null, null, null, null, e.getMessage());
         }
     }
 
@@ -66,7 +66,7 @@ public class UsuarioController {
         try {
             return buscarUsuarioUC.run(cpf);
         } catch (Exception e) {
-            return new UsuarioResponse(0, null, e.getMessage());
+            return new UsuarioResponse(0, null, null, null, null, null, null, e.getMessage());
         }
     }
 
@@ -80,7 +80,7 @@ public class UsuarioController {
         try {
             return editarUsuarioUC.run(cpf, request);
         } catch (Exception e) {
-            return new UsuarioResponse(0, null, e.getMessage());
+            return new UsuarioResponse(0, null, null, null, null, null, null, e.getMessage());
         }
     }
 
