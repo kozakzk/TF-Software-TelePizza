@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidoRepository;
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Cliente;
+import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Usuario;
 
 @Service
 public class DescontosServicePadrao implements DescontosService {
@@ -17,10 +17,10 @@ public class DescontosServicePadrao implements DescontosService {
     }
 
     @Override
-    public double getPercentualDesconto(Cliente cliente) {
+    public double getPercentualDesconto(Usuario cliente) {
         int nroPedidos = pedidoRepository.nroPedidosCliente(cliente.getCpf());
         if (nroPedidos > 3) {
-            return 0.07; 
+            return 0.07;
         }
         return 0.0;
     }

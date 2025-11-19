@@ -18,17 +18,25 @@ DROP TABLE IF EXISTS "itens_estoque" CASCADE;
 
 DROP TABLE IF EXISTS "clientes" CASCADE;
 
+DROP TABLE IF EXISTS "usuarios" CASCADE;
+
 DROP TABLE IF EXISTS "pedidos" CASCADE;
 
 DROP TABLE IF EXISTS "itens_pedido" CASCADE;
 
--- Tabela de Clientes
-CREATE TABLE IF NOT EXISTS clientes (
+DROP TYPE role_type;
+
+CREATE TYPE role_type AS ENUM ('admin', 'cliente');
+
+-- Tabela de Usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
     cpf VARCHAR(15) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     celular VARCHAR(20) NOT NULL,
     endereco VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL
+    email VARCHAR(255) NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    role role_type NOT NULL DEFAULT 'cliente'
 );
 
 -- Tabela de Ingredientes
@@ -74,7 +82,8 @@ CREATE TABLE IF NOT EXISTS produto_receita (
 -- Tabela de Cardápios
 CREATE TABLE IF NOT EXISTS cardapios (
     id BIGSERIAL PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL
+    titulo VARCHAR(255) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- Tabela Cardápio x Produto
@@ -87,7 +96,7 @@ CREATE TABLE IF NOT EXISTS cardapio_produto (
 -- Tabela de Pedidos
 CREATE TABLE IF NOT EXISTS pedidos (
     id BIGSERIAL PRIMARY KEY,
-    cliente_cpf VARCHAR(15) NOT NULL REFERENCES clientes (cpf),
+    cliente_cpf VARCHAR(15) NOT NULL REFERENCES usuarios (cpf),
     data_hora_pagamento TIMESTAMP,
     status VARCHAR(50) NOT NULL,
     valor NUMERIC(10, 2) NOT NULL,

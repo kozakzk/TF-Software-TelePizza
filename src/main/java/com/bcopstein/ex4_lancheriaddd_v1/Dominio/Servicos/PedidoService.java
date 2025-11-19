@@ -9,26 +9,26 @@ import org.springframework.stereotype.Service;
 
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Requests.SubmeterPedidoRequest;
 import com.bcopstein.ex4_lancheriaddd_v1.Aplicacao.Responses.PedidoStatusResponse;
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.ClienteRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.PedidoRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.ProdutosRepository;
-import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Cliente;
+import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Dados.UsuarioRepository;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.ItemPedido;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Pedido;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Produto;
+import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Usuario;
 
 @Service
 public class PedidoService {
 
     private final PedidoRepository pedidoRepository;
-    private final ClienteRepository clienteRepository;
+    private final UsuarioRepository clienteRepository;
     private final ProdutosRepository produtosRepository;
     private final EstoqueService estoqueService;
     private final DescontosService descontosService;
     private final PagamentoService pagamentoService;
 
     @Autowired
-    public PedidoService(PedidoRepository pedidoRepository, ClienteRepository clienteRepository,
+    public PedidoService(PedidoRepository pedidoRepository, UsuarioRepository clienteRepository,
             ProdutosRepository produtosRepository, EstoqueService estoqueService,
             DescontosService descontosService, PagamentoService pagamentoService) {
         this.pedidoRepository = pedidoRepository;
@@ -40,7 +40,7 @@ public class PedidoService {
     }
 
     public Pedido submeterPedido(SubmeterPedidoRequest request) {
-        Cliente cliente = clienteRepository.recuperaPorCpf(request.cpfCliente());
+        Usuario cliente = clienteRepository.recuperaPorCpf(request.cpfCliente());
         if (cliente == null) {
             throw new IllegalArgumentException("Cliente não encontrado!");
         }

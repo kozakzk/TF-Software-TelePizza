@@ -13,23 +13,24 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Cardapio;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Produto;
 
 @Component
-public class CardapioRepositoryJDBC implements CardapioRepository{
+public class CardapioRepositoryJDBC implements CardapioRepository {
+
     private JdbcTemplate jdbcTemplate;
     private ProdutosRepository produtosRepository;
 
     @Autowired
-    public CardapioRepositoryJDBC(JdbcTemplate jdbcTemplate,ProdutosRepository  produtosRepository){
+    public CardapioRepositoryJDBC(JdbcTemplate jdbcTemplate, ProdutosRepository produtosRepository) {
         this.jdbcTemplate = jdbcTemplate;
         this.produtosRepository = produtosRepository;
     }
 
     @Override
     public Cardapio recuperaPorId(long id) {
-        String sql = "SELECT id, titulo FROM cardapios WHERE id = ?";
+        String sql = "SELECT id, titulo, active FROM cardapios WHERE id = ?";
         List<Cardapio> cardapios = this.jdbcTemplate.query(
-            sql,
-            ps -> ps.setLong(1, id),
-            (rs, rowNum) -> new Cardapio(rs.getLong("id"), rs.getString("titulo"), null)
+                sql,
+                ps -> ps.setLong(1, id),
+                (rs, rowNum) -> new Cardapio(rs.getLong("id"), rs.getString("titulo"), rs.getBoolean("active"), null)
         );
         if (cardapios.isEmpty()) {
             return null;
@@ -42,18 +43,45 @@ public class CardapioRepositoryJDBC implements CardapioRepository{
 
     @Override
     public List<Produto> indicacoesDoChef() {
-        return List.of(produtosRepository.recuperaProdutoPorid(2L));   
+        return List.of(produtosRepository.recuperaProdutoPorid(2L));
     }
 
     @Override
-    public List<CabecalhoCardapio> cardapiosDisponiveis(){
-        String sql = "SELECT id, titulo FROM cardapios";
+    public List<CabecalhoCardapio> cardapiosDisponiveis() {
+        String sql = "SELECT id, titulo, active FROM cardapios";
         List<CabecalhoCardapio> cabCardapios = this.jdbcTemplate.query(
-            sql,
-            ps->{},
-            (rs, rowNum) -> new CabecalhoCardapio(rs.getLong("id"), rs.getString("titulo"))
+                sql,
+                ps -> {
+                },
+                (rs, rowNum) -> new CabecalhoCardapio(rs.getLong("id"), rs.getString("titulo"), rs.getBoolean("active"))
         );
         return cabCardapios;
     }
-    
+
+    @Override
+    public boolean ativaCardapio(long id) {
+        String sqlDeactivate = "UPDATE cardapios SET active = FALSE";
+        String sqlActivate = "UPDATE cardapios SET active = TRUE WHERE id = ?";
+        this.jdbcTemplate.update(sqlDeactivate);
+        int rowsAffectedActivate = this.jdbcTemplate.update(sqlActivate, id);
+        return rowsAffectedActivate > 0;
+    }
+
+    @Override
+    public Cardapio recuperaAtivo() {
+        String sql = "SELECT id, titulo, active FROM cardapios WHERE active = TRUE";
+        List<Cardapio> cardapios = this.jdbcTemplate.query(
+                sql,
+                ps -> {
+                },
+                (rs, rowNum) -> new Cardapio(rs.getLong("id"), rs.getString("titulo"), rs.getBoolean("active"), null)
+        );
+        if (cardapios.isEmpty()) {
+            return null;
+        }
+        Cardapio cardapio = cardapios.get(0);
+        List<Produto> produtos = produtosRepository.recuperaProdutosCardapio(cardapio.getId());
+        cardapio.setProdutos(produtos);
+        return cardapio;
+    }
 }

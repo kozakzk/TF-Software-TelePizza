@@ -17,7 +17,7 @@ public class Pedido {
         ENTREGUE
     }
     private long id;
-    private Cliente cliente;
+    private Usuario cliente;
     private LocalDateTime dataHoraPagamento;
     private List<ItemPedido> itens;
     private Status status;
@@ -26,7 +26,7 @@ public class Pedido {
     private double desconto;
     private double valorCobrado;
 
-    public Pedido(long id, Cliente cliente, LocalDateTime dataHoraPagamento, List<ItemPedido> itens,
+    public Pedido(long id, Usuario cliente, LocalDateTime dataHoraPagamento, List<ItemPedido> itens,
             Pedido.Status status, double valor, double impostos, double desconto, double valorCobrado) {
         this.id = id;
         this.cliente = cliente;
@@ -43,7 +43,7 @@ public class Pedido {
         return id;
     }
 
-    public Cliente getCliente() {
+    public Usuario getCliente() {
         return cliente;
     }
 

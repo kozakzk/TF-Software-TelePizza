@@ -7,7 +7,14 @@ import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Cardapio;
 import com.bcopstein.ex4_lancheriaddd_v1.Dominio.Entidades.Produto;
 
 public interface CardapioRepository {
+
     List<CabecalhoCardapio> cardapiosDisponiveis();
+
     Cardapio recuperaPorId(long id);
+
+    Cardapio recuperaAtivo();
+
     List<Produto> indicacoesDoChef();
+
+    boolean ativaCardapio(long id);
 }
